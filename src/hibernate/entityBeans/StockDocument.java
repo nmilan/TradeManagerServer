@@ -20,6 +20,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import util.DateUtil;
 import util.EntityObject;
 
 @Entity
@@ -51,6 +52,8 @@ public class StockDocument implements Serializable, EntityObject{
 	private Set<StockDocumentPayment> payments = null;
 	
 	private Boolean canceled = Boolean.FALSE;
+	
+	private Boolean paid = Boolean.FALSE;
 	
 	public StockDocument(){
 		items = new HashSet<StockDocumentItem>();
@@ -149,7 +152,6 @@ public class StockDocument implements Serializable, EntityObject{
 	public void setItems(Set<StockDocumentItem> items) {
 		this.items = items;
 	}
-	
 	public Date getCreationTime() {
 		return creationTime;
 	}
@@ -195,6 +197,15 @@ public class StockDocument implements Serializable, EntityObject{
 		
 		return price;
 	}
+	@Transient
+	public BigDecimal getDept(){
+		BigDecimal dept = new BigDecimal("0.00");
+		dept.setScale(2, BigDecimal.ROUND_CEILING);
+		
+		dept = dept.add(new BigDecimal((getTotalPrice().doubleValue()-getTotalPayments().doubleValue())));
+		
+		return dept;
+	}
 	
 	@Transient
 	public BigDecimal getTotalPayments(){
@@ -210,14 +221,27 @@ public class StockDocument implements Serializable, EntityObject{
 		return totalPayments;
 	}
 	
-	@Transient
+	@Column(name = "paid", nullable = false)
 	public Boolean getPaid() {
+		return paid;
+	}
+	@Transient
+	public Boolean getPaidPay() {
 		BigDecimal diff = new BigDecimal("0.00");
 		diff.setScale(2, BigDecimal.ROUND_CEILING);
-		diff = getTotalPrice().subtract(getTotalPayments());
-		return Math.abs(diff.doubleValue()) <= 1;
+		if(getDept().doubleValue()<1){
+			return true;
+		}
+		return false;
 	}
 	
+	public void setPaid(Boolean paid) {
+		this.paid = paid;
+	}
+	@Transient
+	public Integer getPayPeriod() {
+		return DateUtil.getDateDayDifference(getCreationTime(),getPaymentDay());
+	}
 	@Override
 	@Transient
 	public String getName() {

@@ -119,4 +119,8 @@ public class BusinessPartner implements Serializable, EntityObject{
 	public void setMobilePhone(String mobilePhone) {
 		this.mobilePhone = mobilePhone;
 	}
+	@Override
+	public String toString() {
+		return "Ime: "+this.ownerName+"\nAdresa kupca: "+this.address+"\nTelefoni: "+this.telephone+"\nOstali komentari: "+this.comments;
+	}
 }

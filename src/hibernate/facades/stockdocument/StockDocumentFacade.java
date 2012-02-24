@@ -207,6 +207,7 @@ public class StockDocumentFacade implements StockDocumentFacadeRemote{
 			}
 			userTx.commit();
 		}catch (Exception e) {
+			e.printStackTrace();
 			try{
 				userTx.rollback();
 			}catch(SystemException se){
